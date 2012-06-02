@@ -1,2 +1,1 @@
-ants
-====
+basic ants simulation
