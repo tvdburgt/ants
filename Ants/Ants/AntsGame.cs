@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using Ants.Model;
 
 namespace Ants
 {
@@ -19,10 +20,15 @@ namespace Ants
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        private Map map;
+
         public AntsGame()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            IsMouseVisible = true;
+            graphics.PreferredBackBufferWidth = 1024;
+            graphics.PreferredBackBufferHeight = 768;
         }
 
         /// <summary>
@@ -48,7 +54,7 @@ namespace Ants
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             var importer = new MapImporter();
-            var map = importer.Import("Content/Maps/map1.txt");
+            map = new Map(this, importer.Import("Content/Maps/map1.txt"));
         }
 
         /// <summary>
@@ -73,9 +79,11 @@ namespace Ants
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.White);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin();
+            map.Draw(spriteBatch);
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }

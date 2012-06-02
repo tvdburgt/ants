@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace Ants
+namespace Ants.Model
 {
     class Square
     {
@@ -12,11 +13,15 @@ namespace Ants
         public readonly int X;
         public readonly int Y;
 
-        public Square(int x, int y, bool isPassable)
+        public Square(int x, int y)
         {
-            IsPassable = isPassable;
             X = x;
             Y = y;
+            IsPassable = true;
         }
+
+        //public void Draw(SpriteBatch batch)
+        //{
+        //}
     }
 }
