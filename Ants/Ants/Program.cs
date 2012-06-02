@@ -10,7 +10,7 @@ namespace Ants
         /// </summary>
         static void Main(string[] args)
         {
-            using (Game1 game = new Game1())
+            using (AntsGame game = new AntsGame())
             {
                 game.Run();
             }
