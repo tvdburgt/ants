@@ -68,9 +68,9 @@ namespace Ants
 
             CreateMap("Content/Maps/map1.txt");
 
-            Ants = new List<Ant>[2];
+            Ants = new List<Ant>[3];
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 3; i++)
 			{
 			    Ants[i] = new List<Ant>();
 			}
@@ -78,7 +78,8 @@ namespace Ants
             AntColors = new Color[]
             {
                 Color.Red,
-                Color.Blue
+                Color.Blue,
+                Color.Green
             };
 
             //Ants[0].Add(new Ant(this, Map.Squares[20, 20], 0));
