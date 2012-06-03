@@ -14,6 +14,7 @@ namespace Ants.Model
         private int team;
         private StateMachine fsm;
         private Vector2 position;
+        private Vector2 animationMargin;
 
         private Square square;
         public Square Square
@@ -47,6 +48,7 @@ namespace Ants.Model
             position = square.ScreenPosition;
             Path = new Stack<Square>();
             fsm = new StateMachine();
+            animationMargin = new Vector2(Square.Width * 2, Square.Height * 2);
         }
 
         public void Update(GameTime time, bool tick, float progress)
@@ -58,12 +60,20 @@ namespace Ants.Model
                 if (Path.Count > 0)
                 {
                     Square = Path.Pop();
+                    Vector2 delta = Square.ScreenPosition - position;
                 }
+                
             }
 
             else if (position != Square.ScreenPosition)
             {
                 Vector2 delta = Square.ScreenPosition - position;
+
+                if (Math.Abs(delta.X) > animationMargin.X|| Math.Abs(delta.Y) > animationMargin.Y)
+                {
+                    position = Square.ScreenPosition;
+                }
+
                 position += delta * progress;
             }
         }
