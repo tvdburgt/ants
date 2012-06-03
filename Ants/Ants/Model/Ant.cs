@@ -58,10 +58,13 @@ namespace Ants.Model
 
                 if (Path.Count > 0)
                 {
-                    Square = Path.Pop();
-                    Vector2 delta = Square.ScreenPosition - position;
+                    Square nextSquare = Path.Pop();
+
+                    if (nextSquare.Ant != null)
+                        Path.Clear();
+                    else
+                        Square = nextSquare;
                 }
-                
             }
 
             else if (position != Square.ScreenPosition)

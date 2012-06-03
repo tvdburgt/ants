@@ -23,7 +23,7 @@ namespace Ants
         SpriteBatch spriteBatch;
 
 
-        private readonly TimeSpan tickRate = TimeSpan.FromSeconds(0.1f);
+        private readonly TimeSpan tickRate = TimeSpan.FromSeconds(1f);
         private readonly TimeSpan spawnRate = TimeSpan.FromSeconds(5);
 
         public Map Map { get; private set; }
@@ -218,7 +218,7 @@ namespace Ants
                     if (square.IsPassable)
                     {
                         Ant ant = new Ant(this, square, i);
-                        ant.ChangeState(new Attack(this, ant));
+                        ant.ChangeState(new AttackState(this, ant));
                         Ants[i].Add(ant);
                         break;
                     }

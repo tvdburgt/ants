@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Ants.States
 {
-    class Follow
+    class FollowState
     {
     }
 }
