@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Ants.States;
 
 namespace Ants.Model
 {
@@ -11,9 +12,12 @@ namespace Ants.Model
     {
         private AntsGame game;
         private int team;
+        private StateMachine fsm;
+
         public Square Square { get; private set; }
         public int AttackRate { get; set; }
         public int Health { get; set; }
+        public Stack<Square> Path { get; set; }
 
         public Ant(AntsGame game, Square square, int team)
         {
@@ -22,10 +26,19 @@ namespace Ants.Model
             Square = square;
             Health = 5;
             AttackRate = 1;
+
+            fsm = new StateMachine();
         }
 
-        public void Update(GameTime time)
+        public void Update(GameTime time, bool tick)
         {
+            if (tick)
+            {
+                if (Path != null && Path.Count > 0)
+                {
+                    Square = Path.Pop();
+                }
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -45,6 +58,11 @@ namespace Ants.Model
                     yield return ant;
                 }
             }
+        }
+
+        public void ChangeState(State state)
+        {
+            fsm.ChangeState(state);
         }
     }
 }

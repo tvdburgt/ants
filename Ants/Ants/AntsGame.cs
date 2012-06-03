@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Ants.Model;
+using Ants.PathFinding;
 
 namespace Ants
 {
@@ -20,16 +21,18 @@ namespace Ants
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+
+        public const int TickDuration = 500;
+
         private Map map;
+        private TimeSpan previousTick;
+        private Texture2D blank;
+        private MouseState mouseState;
+        private MouseState previousMouseState;
 
         public List<Ant>[] Ants { get; private set; }
         public Hill[] Hills { get; private set; }
         public Color[] AntColors { get; private set; }
-
-        public const int TickDuration = 500;
-        private TimeSpan previousTick;
-
-        private Texture2D blank;
 
         public AntsGame()
         {
@@ -101,6 +104,10 @@ namespace Ants
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            previousMouseState = mouseState;
+            mouseState = Mouse.GetState();
+            bool tick = false;
+
             // Allows the game to exit
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 this.Exit();
@@ -108,12 +115,29 @@ namespace Ants
             if (gameTime.TotalGameTime - previousTick > TimeSpan.FromMilliseconds(TickDuration))
             {
                 previousTick = gameTime.TotalGameTime;
-
+                tick = true;
                 AttackAnts();
             }
 
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            foreach (List<Ant> ants in Ants)
             {
+                foreach (Ant ant in ants)
+                {
+                    ant.Update(gameTime, tick);
+                }
+            }
+
+
+            if (mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
+            {
+                int x = (int)(mouseState.X / Square.Width);
+                int y = (int)(mouseState.Y / Square.Height);
+
+                var ant = Ants[0][0];
+
+                ant.Path = AStar.Search(map, ant.Square, map.Squares[y, x], AStar.ManhattanHeuristic);
+
+                Console.WriteLine("{0}, {1}", x, y);
             }
 
             base.Update(gameTime);
