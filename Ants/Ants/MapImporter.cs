@@ -4,38 +4,43 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Ants.Model;
+using Microsoft.Xna.Framework;
 
 namespace Ants
 {
     class MapImporter
     {
-        public Square[,] Import(string path)
+        public void Import(string path, AntsGame game, out Square[,] squares, out Hill[] hills)
         {
-            Square[,] map;
-            var hills = new Hill[2];
-
             using (StreamReader sr = new StreamReader(path))
             {
-                int width = int.Parse(sr.ReadLine());
-                int height = int.Parse(sr.ReadLine());
-                map = new Square[height, width];
+                int colCount = int.Parse(sr.ReadLine());
+                int rowCount = int.Parse(sr.ReadLine());
 
-                sr.ReadLine();
-
+                var viewport = game.GraphicsDevice.Viewport;
+                squares = new Square[rowCount, colCount];
+                hills = new Hill[2];
                 int x = 0;
                 int y = 0;
+
+                Square.Width = (float)viewport.Width / colCount;
+                Square.Height = (float)viewport.Height / rowCount;
+                Vector2 origin = new Vector2(Square.Width / 2f, Square.Height / 2f);
+
+                sr.ReadLine();
 
                 try
                 {
                     
-                    for (y = 0; y < height; y++)
+                    for (y = 0; y < rowCount; y++)
                     {
                         string line = sr.ReadLine();
 
-                        for (x = 0; x < width; x++)
+                        for (x = 0; x < colCount; x++)
                         {
-                            var square = new Square(x, y);
-                            map[y, x] = square;
+                            //Vector2 position = new Vector2(x * Square.Width, y * Square.Height) + origin;
+                            Vector2 position = new Vector2(x * Square.Width, y * Square.Height);
+                            squares[y, x] = new Square(x, y, position);
 
                             switch (line[x])
                             {
@@ -45,15 +50,17 @@ namespace Ants
 
                                 // Impassable square
                                 case '#':
-                                    square.IsPassable = false;
+                                    squares[y, x].IsPassable = false;
                                     break;
 
+                                // Ant hill team 0
                                 case 'a':
-                                    hills[0] = new Hill(square);
+                                    hills[0] = new Hill(game, squares[y, x], 0);
                                     break;
 
+                                // Ant hill team 1
                                 case 'b':
-                                    hills[1] = new Hill(square);
+                                    hills[1] = new Hill(game, squares[y, x], 1);
                                     break;
 
                                 default:
@@ -63,13 +70,11 @@ namespace Ants
                     }
                 }
 
-                catch (IndexOutOfRangeException)
+                catch (Exception)
                 {
                     throw new FormatException("Map error at row " + (y + 1) + ", column " + (x + 1));
                 }
             }
-
-            return map;
         }
     }
 }

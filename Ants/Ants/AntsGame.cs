@@ -22,6 +22,15 @@ namespace Ants
 
         private Map map;
 
+        public List<Ant>[] Ants { get; private set; }
+        public Hill[] Hills { get; private set; }
+        public Color[] AntColors { get; private set; }
+
+        public const int TickDuration = 500;
+        private TimeSpan previousTick;
+
+        private Texture2D blank;
+
         public AntsGame()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -53,8 +62,36 @@ namespace Ants
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            CreateMap("Content/Maps/map1.txt");
+
+            Ants = new List<Ant>[]
+            {
+                new List<Ant>(),
+                new List<Ant>()
+            };
+
+            AntColors = new Color[]
+            {
+                Color.Red,
+                Color.Blue
+            };
+
+            Ants[0].Add(new Ant(this, map.Squares[20, 20], 0));
+
+            blank = new Texture2D(GraphicsDevice, 1, 1);
+            blank.SetData(new[] { Color.White });
+        }
+
+        private void CreateMap(string path)
+        {
             var importer = new MapImporter();
-            map = new Map(this, importer.Import("Content/Maps/map1.txt"));
+            Square[,] squares;
+            Hill[] hills;
+
+            importer.Import(path, this, out squares, out hills);
+            map = new Map(this, squares);
+
+            Hills = hills;
         }
 
         /// <summary>
@@ -68,9 +105,32 @@ namespace Ants
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 this.Exit();
 
-            // TODO: Add your update logic here
+            if (gameTime.TotalGameTime - previousTick > TimeSpan.FromMilliseconds(TickDuration))
+            {
+                previousTick = gameTime.TotalGameTime;
+
+                AttackAnts();
+            }
+
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+            }
 
             base.Update(gameTime);
+        }
+
+        private void AttackAnts()
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < Ants.Length; j++)
+                {
+                    foreach (var ant in Ants[i])
+                    {
+                        
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -83,9 +143,70 @@ namespace Ants
 
             spriteBatch.Begin();
             map.Draw(spriteBatch);
+
+            for (int i = 0; i < Ants.Length; i++)
+            {
+                foreach (var ant in Ants[i])
+                {
+                    ant.Draw(spriteBatch);
+                }
+            }
+
+            for (int i = 0; i < Hills.Length; i++)
+            {
+                Hills[i].Draw(spriteBatch, AntColors[i]);
+            }
+
             spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        public void DrawLine(Color color, float x1, float y1, float x2, float y2)
+        {
+            var point1 = new Vector2(x1, y1);
+            var point2 = new Vector2(x2, y2);
+
+            float angle = (float)Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
+            float length = Vector2.Distance(point1, point2);
+
+            spriteBatch.Draw(blank, point1, null, color,
+                       angle, Vector2.Zero, new Vector2(length, 1),
+                       SpriteEffects.None, 0);
+        }
+
+        public void FillSquare(Square square, Color color)
+        {
+            Vector2 scale = new Vector2(Square.Width, Square.Height);
+            spriteBatch.Draw(blank, square.ScreenPosition, null, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+        }
+
+        public Texture2D CreateCircle(int radius, Color color)
+        {
+            int outerRadius = radius * 2 + 2; // So circle doesn't go out of bounds
+            Texture2D texture = new Texture2D(GraphicsDevice, outerRadius, outerRadius);
+
+            Color[] data = new Color[outerRadius * outerRadius];
+
+            // Colour the entire texture transparent first.
+            for (int i = 0; i < data.Length; i++)
+                data[i] = Color.Transparent;
+
+            // Work out the minimum step necessary using trigonometry + sine approximation.
+            double angleStep = 1f / radius;
+
+            for (double angle = 0; angle < Math.PI * 2; angle += angleStep)
+            {
+                // Use the parametric definition of a circle: http://en.wikipedia.org/wiki/Circle#Cartesian_coordinates
+                int x = (int)Math.Round(radius + radius * Math.Cos(angle));
+                int y = (int)Math.Round(radius + radius * Math.Sin(angle));
+
+                data[y * outerRadius + x + 1] = color;
+            }
+
+            texture.SetData(data);
+
+            return texture;
         }
     }
 }

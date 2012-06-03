@@ -7,95 +7,103 @@ using Microsoft.Xna.Framework;
 
 namespace Ants.Model
 {
-    class Map
+    public class Map
     {
+        private const bool ShowGrid = true;
         private AntsGame game;
-        private Square[,] squares;
-        private Texture2D blankTexture;
+        public Square[,] Squares { get; private set; }
 
-        public float SquareWidth { get; private set; }
-        public float SquareHeight { get; private set; }
+        private readonly Color gridColor = new Color(200, 200, 200);
 
-        public int Width
+        public int Columns
         {
             get
             {
-                return squares.GetLength(1);
+                return Squares.GetLength(1);
             }
         }
 
-        public int Height
+        public int Rows
         {
             get
             {
-                return squares.GetLength(0);
+                return Squares.GetLength(0);
             }
         }
 
         public Map(AntsGame game, Square[,] squares)
         {
             this.game = game;
-            this.squares = squares;
-            Initialize();
-        }
-
-        public void Initialize()
-        {
-            blankTexture = new Texture2D(game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
-            blankTexture.SetData(new[] { Color.White });
-
-            var viewport = game.GraphicsDevice.Viewport;
-            SquareHeight = (float)viewport.Height / Height;
-            SquareWidth = (float)viewport.Width / Width;
+            Squares = squares;
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            if (ShowGrid)
+                DrawGrid(spriteBatch);
 
-            var viewport = game.GraphicsDevice.Viewport;
-
-            for (int y = 0; y < Height; y++)
+            for (int y = 0; y < Rows; y++)
             {
-
-                var yCoord = y * SquareHeight - 1;
-
-                // Horizontal line
-                DrawGridLine(spriteBatch, Color.Black, 0, yCoord, viewport.Width, yCoord);
-
-                for (int x = 0; x < Width; x++)
+                for (int x = 0; x < Columns; x++)
                 {
-                    var xCoord = x * SquareWidth;
-
-                    // Vertical line
-                    DrawGridLine(spriteBatch, Color.Black, xCoord, 0, xCoord, viewport.Height);
-
-
-
-                    if (!squares[y, x].IsPassable)
-                        DrawSquare(spriteBatch, Color.LightGray, x * SquareWidth, y * SquareHeight);
-
-                    //squares[y, x].Draw(spriteBatch);
+                    if (!Squares[y, x].IsPassable)
+                        game.FillSquare(Squares[y, x], Color.Black);
                 }
             }
         }
 
-        private void DrawSquare(SpriteBatch spriteBatch, Color color, float x, float y)
+        private void DrawGrid(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(blankTexture, new Rectangle((int)x, (int)y, (int)SquareWidth, (int)SquareHeight), color);
+            var viewport = game.GraphicsDevice.Viewport;
+
+            for (int y = 0; y < Rows; y++)
+            {
+                var yCoord = y * Square.Height;
+
+                // Horizontal
+                game.DrawLine(gridColor, 0, yCoord, viewport.Width, yCoord);
+
+                for (int x = 0; x < Columns; x++)
+                {
+                    var xCoord = x * Square.Width;
+
+                    // Vertical
+                    game.DrawLine(gridColor, xCoord, 0, xCoord, viewport.Height);
+                }
+            }
         }
 
-        private void DrawGridLine(SpriteBatch spriteBatch, Color color, float x1, float y1, float x2, float y2)
+        public Square[] GetNeighbors(Square square)
         {
-            var point1 = new Vector2(x1, y1);
-            var point2 = new Vector2(x2, y2);
+            int x = square.X;
+            int y = square.Y;
 
-            float angle = (float)Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
-            float length = Vector2.Distance(point1, point2);
-
-            spriteBatch.Draw(blankTexture, point1, null, color,
-                       angle, Vector2.Zero, new Vector2(length, 1),
-                       SpriteEffects.None, 0);
+            return new Square[]
+            {
+                Squares[(y + 1) % Rows, x], // 12
+                Squares[y, (x + 1) % Columns], // 3
+                Squares[(y - 1) % Rows, x], // 6
+                Squares[y, (x - 1) % Columns], // 9
+            };
         }
+
+        //private void DrawSquare(SpriteBatch spriteBatch, Color color, float x, float y)
+        //{
+        //    spriteBatch.Draw(blankTexture, new Rectangle((int)x, (int)y, (int)Square.Width, (int)Square.Height), color);
+        //}
+
+        //private void DrawGridLine(SpriteBatch spriteBatch, Color color, float x1, float y1, float x2, float y2)
+        //{
+        //    var point1 = new Vector2(x1, y1);
+        //    var point2 = new Vector2(x2, y2);
+
+        //    float angle = (float)Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
+        //    float length = Vector2.Distance(point1, point2);
+
+        //    spriteBatch.Draw(blankTexture, point1, null, color,
+        //               angle, Vector2.Zero, new Vector2(length, 1),
+        //               SpriteEffects.None, 0);
+        //}
     }
 }
 
