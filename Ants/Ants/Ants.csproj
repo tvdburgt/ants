@@ -115,6 +115,11 @@
     <Compile Include="Program.cs" />
     <Compile Include="AntsGame.cs" />
     <Compile Include="Model\Square.cs" />
+    <Compile Include="StateMachine.cs" />
+    <Compile Include="States\Attack.cs" />
+    <Compile Include="States\Flee.cs" />
+    <Compile Include="States\Follow.cs" />
+    <Compile Include="States\State.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
