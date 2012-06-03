@@ -22,9 +22,10 @@ namespace Ants
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        private const int TeamCount = 2;
 
-        private readonly TimeSpan tickRate = TimeSpan.FromSeconds(1f);
-        private readonly TimeSpan spawnRate = TimeSpan.FromSeconds(5);
+        private readonly TimeSpan tickRate;
+        private readonly TimeSpan spawnRate;
 
         public Map Map { get; private set; }
         private TimeSpan previousTick;
@@ -44,6 +45,9 @@ namespace Ants
             IsMouseVisible = true;
             graphics.PreferredBackBufferWidth = 1024;
             graphics.PreferredBackBufferHeight = 768;
+
+            tickRate = TimeSpan.FromSeconds(0.3f);
+            spawnRate = TimeSpan.FromSeconds(tickRate.TotalSeconds * 10);
         }
 
         /// <summary>
@@ -68,9 +72,9 @@ namespace Ants
 
             CreateMap("Content/Maps/map1.txt");
 
-            Ants = new List<Ant>[2];
+            Ants = new List<Ant>[TeamCount];
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < TeamCount; i++)
 			{
 			    Ants[i] = new List<Ant>();
 			}
@@ -78,27 +82,15 @@ namespace Ants
             AntColors = new Color[]
             {
                 Color.Red,
-                Color.Blue
+                Color.Blue,
+                Color.Green
             };
 
-            //Ants[0].Add(new Ant(this, Map.Squares[20, 20], 0));
-            //Ants[0].Add(new Ant(this, Map.Squares[20, 22], 0));
-            //Ants[0].Add(new Ant(this, Map.Squares[20, 24], 0));
-            //Ants[1].Add(new Ant(this, Map.Squares[25, 60], 1));
-            //Ants[1].Add(new Ant(this, Map.Squares[27, 60], 1));
-            //Ants[1].Add(new Ant(this, Map.Squares[30, 60], 1));
-
-            //foreach (var ants in Ants)
-            //{
-            //    foreach (Ant ant in ants)
-            //    {
-            //        //ant.ChangeState(new Attack(this, ant));
-            //    }
-            //}
-
-            SpawnAnts();
-            SpawnAnts();
-            
+            for (int i = 0; i < 4; i++)
+            {
+                SpawnAnts();    
+            }
+           
 
             blank = new Texture2D(GraphicsDevice, 1, 1);
             blank.SetData(new[] { Color.White });
@@ -156,27 +148,26 @@ namespace Ants
                 }
             }
 
+            //if (mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
+            //{
+            //    int x = (int)(mouseState.X / Square.Width);
+            //    int y = (int)(mouseState.Y / Square.Height);
 
-            if (mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
-            {
-                int x = (int)(mouseState.X / Square.Width);
-                int y = (int)(mouseState.Y / Square.Height);
+            //    if (x < 0 || x >= Map.Columns || y < 0 || y > Map.Rows)
+            //    {
+            //        // Outside window
+            //    }
 
-                if (x < 0 || x >= Map.Columns || y < 0 || y > Map.Rows)
-                {
-                    // Outside window
-                }
+            //    else
+            //    {
 
-                else
-                {
+            //        var ant = Ants[0][0];
 
-                    var ant = Ants[0][0];
+            //        ant.Path = AStar.Search(Map, ant.Square, Map.Squares[y, x], Map.Distance);
 
-                    ant.Path = AStar.Search(Map, ant.Square, Map.Squares[y, x], Map.Distance);
-
-                    Console.WriteLine("{0}, {1}", x, y);
-                }
-            }
+            //        Console.WriteLine("{0}, {1}", x, y);
+            //    }
+            //}
 
             base.Update(gameTime);
         }
@@ -195,8 +186,12 @@ namespace Ants
                         {
                             bool isDead = ant.Attack(neighbor.Ant);
 
+                            // Remove dead ants after all ants are processed
                             if (isDead)
                                 deadAnts.Add(neighbor.Ant);
+
+                            // Allow only one attack for every ant
+                            break;
                         }
                     }
                 }
@@ -205,8 +200,8 @@ namespace Ants
             foreach (Ant ant in deadAnts)
             {
                 Ants[ant.Team].Remove(ant);
+                ant.Square.Ant = null;
             }
-            
         }
 
         private void SpawnAnts()
@@ -223,31 +218,6 @@ namespace Ants
                         break;
                     }
                 }
-
-
-                //Square emptySquare = null;
-                //Stack<Square> squares = new Stack<Square>();
-                //squares.Push(Hills[i].Square);
-
-                //while (squares.Count > 0)
-                //{
-                //    var square = squares.Pop();
-
-                //    if (square.IsPassable)
-                //    {
-                //        emptySquare = square;
-                //        break;
-                //    }
-
-                //    foreach (var neighbor in Map.GetNeighbors(square))
-                //    {
-                //        squares.Push(neighbor);
-                //    }
-                //}
-
-                //if (emptySquare != null)
-                //    Ants[i].Add(new Ant(this, emptySquare, i));
-
             }
         }
 

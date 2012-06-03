@@ -22,12 +22,12 @@ namespace Ants.States
 
         public virtual void Enter()
         {
-            Console.WriteLine("Entered state {0} for entity {1}", GetType(), Agent.GetType());
+            Console.WriteLine("Entered state {0} for entity {1}", GetType(), Agent);
         }
 
         public virtual void Exit()
         {
-            Console.WriteLine("Exited state {0} for entity {1}", GetType(), Agent.GetType());
+            Console.WriteLine("Exited state {0} for entity {1}", GetType(), Agent);
         }
     }
 }

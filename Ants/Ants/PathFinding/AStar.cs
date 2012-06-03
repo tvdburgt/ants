@@ -37,7 +37,7 @@ namespace Ants.PathFinding
                 foreach (Square neighbor in map.GetNeighbors(current))
                 {
                     // Check if node is already processed or not passable
-                    if (closed.Contains(neighbor) || !neighbor.IsPassable)
+                    if (closed.Contains(neighbor) || (neighbor != target && !neighbor.IsPassable))
                         continue;
 
                     // Tentative g score

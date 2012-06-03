@@ -13,7 +13,7 @@ namespace Ants.Model
         private AntsGame game;
         public Square[,] Squares { get; private set; }
 
-        private readonly Color gridColor = new Color(200, 200, 200);
+        private readonly Color gridColor = new Color(235, 235, 235);
 
         public int Columns
         {
@@ -78,17 +78,46 @@ namespace Ants.Model
             int x = square.X;
             int y = square.Y;
 
-            var a = -1 % 60;
-
             return new Square[]
             {
-                Squares[(y + 1) % Rows, x], // 12
-                Squares[y, (x + 1) % Columns], // 3
-
-                // C#'s modulo doesn't work well with negative numbers, so use ternary statement here
-                Squares[y - 1 < 0 ? Rows - 1 : y - 1, x], // 6
-                Squares[y, x - 1 < 0 ? Columns - 1 : x - 1], // 9
+                GetSquare(x, y + 1), // 12
+                GetSquare(x + 1, y), // 3
+                GetSquare(x, y - 1), // 6
+                GetSquare(x - 1, y), // 9
             };
+        }
+
+        public Square[] GetSquares(Square square, int range)
+        {
+            if (range < 0)
+                throw new ArgumentException("Range must be greater than 0");
+
+            // n = (range * 2 + 1)^2
+            int size = range * 2 + 1;
+            var squares = new Square[size * size];
+            int i = 0;
+
+            for (int y = square.Y - range; y <= square.Y + range; y++)
+            {
+                for (int x = square.X - range; x <= square.X + range; x++)
+                {
+                    squares[i++] = GetSquare(x, y);
+                }
+            }
+
+            return squares;
+        }
+
+        // Helper function for toroidal movement (pathfinding etc.)
+        private Square GetSquare(int x, int y)
+        {
+            if (x < 0)
+                x = Columns - 1;
+
+            if (y < 0)
+                y = Rows - 1;
+
+            return Squares[y % Rows, x % Columns];
         }
 
         public int Distance(Square square1, Square square2)

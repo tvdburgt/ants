@@ -19,12 +19,13 @@ namespace Ants.Model
         {
             get
             {
-                return !IsObstacle && Ant == null;
+                return !IsObstacle && Hill == null && Ant == null;
             }
         }
 
         public bool IsObstacle { get; set; }
         public Ant Ant { get; set; }
+        public Hill Hill { get; set; }
         public static float Width { get; set; }
         public static float Height { get; set; }
         public SquareScore Score { get; set; }

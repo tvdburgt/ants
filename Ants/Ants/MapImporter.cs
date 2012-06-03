@@ -22,6 +22,7 @@ namespace Ants
                 hills = new Hill[2];
                 int x = 0;
                 int y = 0;
+                Hill hill;
 
                 Square.Width = (float)viewport.Width / colCount;
                 Square.Height = (float)viewport.Height / rowCount;
@@ -55,12 +56,16 @@ namespace Ants
 
                                 // Ant hill team 0
                                 case 'a':
-                                    hills[0] = new Hill(game, squares[y, x], 0);
+                                    hill = new Hill(game, squares[y, x], 0); 
+                                    hills[0] = hill;
+                                    squares[y, x].Hill = hill;
                                     break;
 
                                 // Ant hill team 1
                                 case 'b':
-                                    hills[1] = new Hill(game, squares[y, x], 1);
+                                    hill = new Hill(game, squares[y, x], 1); 
+                                    hills[1] = hill;
+                                    squares[y, x].Hill = hill;
                                     break;
 
                                 default:

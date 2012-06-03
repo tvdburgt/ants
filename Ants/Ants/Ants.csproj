@@ -120,6 +120,7 @@
     <Compile Include="StateMachine.cs" />
     <Compile Include="States\AttackState.cs" />
     <Compile Include="States\FleeState.cs" />
+    <Compile Include="States\FlockState.cs" />
     <Compile Include="States\FollowState.cs" />
     <Compile Include="States\State.cs" />
   </ItemGroup>

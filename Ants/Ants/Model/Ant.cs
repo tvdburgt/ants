@@ -32,6 +32,14 @@ namespace Ants.Model
             }
         }
 
+        public bool IsDead
+        {
+            get
+            {
+                return Health <= 0;
+            }
+        }
+
         public readonly int Team;
         public int AttackRate { get; set; }
         public int Health { get; set; }
@@ -60,7 +68,7 @@ namespace Ants.Model
                 {
                     Square nextSquare = Path.Pop();
 
-                    if (nextSquare.Ant != null)
+                    if (!nextSquare.IsPassable)
                         Path.Clear();
                     else
                         Square = nextSquare;
@@ -69,15 +77,20 @@ namespace Ants.Model
 
             else if (position != Square.ScreenPosition)
             {
-                Vector2 delta = Square.ScreenPosition - position;
-
-                if (Math.Abs(delta.X) > animationMargin.X|| Math.Abs(delta.Y) > animationMargin.Y)
-                {
-                    position = Square.ScreenPosition;
-                }
-
-                position += delta * progress;
+                UpdateMovement(progress);
             }
+        }
+
+        private void UpdateMovement(float progress)
+        {
+            Vector2 delta = Square.ScreenPosition - position;
+
+            if (Math.Abs(delta.X) > animationMargin.X || Math.Abs(delta.Y) > animationMargin.Y)
+            {
+                position = Square.ScreenPosition;
+            }
+
+            position += delta * progress;
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -112,13 +125,13 @@ namespace Ants.Model
         public bool Attack(Ant target)
         {
             // Check if ant is already dead
-            if (target.Health <= 0)
+            if (target.IsDead)
                 return false;
 
 
             target.Health -= AttackRate;
 
-            if (target.Health <= 0)
+            if (target.IsDead)
             {
                 AttackRate++;
                 Console.WriteLine("{0} killed {1} (new attack rate: {2})", this, target, AttackRate);
@@ -126,6 +139,11 @@ namespace Ants.Model
             }
 
             return false;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("ant [{0}, {1}]", Square.X, Square.Y);
         }
     }
 }
