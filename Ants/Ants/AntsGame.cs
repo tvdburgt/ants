@@ -22,7 +22,7 @@ namespace Ants
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        private const int TeamCount = 2;
+        public const int TeamCount = 2;
 
         private readonly TimeSpan tickRate;
         private readonly TimeSpan spawnRate;

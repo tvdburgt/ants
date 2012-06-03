@@ -19,7 +19,7 @@ namespace Ants
 
                 var viewport = game.GraphicsDevice.Viewport;
                 squares = new Square[rowCount, colCount];
-                hills = new Hill[2];
+                hills = new Hill[AntsGame.TeamCount];
                 int x = 0;
                 int y = 0;
                 Hill hill;
@@ -66,6 +66,10 @@ namespace Ants
                                     hill = new Hill(game, squares[y, x], 1); 
                                     hills[1] = hill;
                                     squares[y, x].Hill = hill;
+                                    break;
+
+                                case 'c':
+                                    hills[2] = new Hill(game, squares[y, x], 2);
                                     break;
 
                                 default:
