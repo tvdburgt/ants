@@ -15,7 +15,24 @@ namespace Ants.Model
         private StateMachine fsm;
         private Vector2 position;
 
-        public Square Square { get; private set; }
+        private Square square;
+        public Square Square
+        {
+            get
+            {
+                return square;
+            }
+            set
+            {
+                if (square != null)
+                    square.Ant = null;
+
+                square = value;
+                square.Ant = this;
+            }
+        }
+
+
         public int AttackRate { get; set; }
         public int Health { get; set; }
         public Stack<Square> Path { get; set; }
@@ -28,7 +45,7 @@ namespace Ants.Model
             Health = 5;
             AttackRate = 1;
             position = square.ScreenPosition;
-
+            Path = new Stack<Square>();
             fsm = new StateMachine();
         }
 
@@ -36,8 +53,9 @@ namespace Ants.Model
         {
             if (tick)
             {
-                
-                if (Path != null && Path.Count > 0)
+                fsm.Update(time);
+
+                if (Path.Count > 0)
                 {
                     Square = Path.Pop();
                 }
@@ -55,7 +73,7 @@ namespace Ants.Model
             game.FillSquare(position, game.AntColors[team]);
         }
 
-        private IEnumerable<Ant> GetEnemyAnts()
+        public IEnumerable<Ant> GetEnemyAnts()
         {
             for (int i = 0; i < game.Ants.Length; i++)
             {

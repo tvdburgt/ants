@@ -9,11 +9,22 @@ namespace Ants.Model
 {
     public class Square : IComparable<Square>
     {
-        public bool IsPassable { get; set; }
+        
 
         public readonly int X;
         public readonly int Y;
         public readonly Vector2 ScreenPosition;
+
+        public bool IsPassable
+        {
+            get
+            {
+                return !IsObstacle && Ant == null;
+            }
+        }
+
+        public bool IsObstacle { get; set; }
+        public Ant Ant { get; set; }
         public static float Width { get; set; }
         public static float Height { get; set; }
         public SquareScore Score { get; set; }
@@ -22,7 +33,6 @@ namespace Ants.Model
         {
             X = x;
             Y = y;
-            IsPassable = true;
             ScreenPosition = screenPosition;
             Score = new SquareScore();
         }

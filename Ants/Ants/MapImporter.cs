@@ -50,7 +50,7 @@ namespace Ants
 
                                 // Impassable square
                                 case '#':
-                                    squares[y, x].IsPassable = false;
+                                    squares[y, x].IsObstacle = true;
                                     break;
 
                                 // Ant hill team 0

@@ -46,7 +46,7 @@ namespace Ants.Model
             {
                 for (int x = 0; x < Columns; x++)
                 {
-                    if (!Squares[y, x].IsPassable)
+                    if (Squares[y, x].IsObstacle)
                         game.FillSquare(Squares[y, x].ScreenPosition, Color.Black);
                 }
             }

@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Ants.Model;
 using Ants.PathFinding;
+using Ants.States;
 
 namespace Ants
 {
@@ -22,9 +23,9 @@ namespace Ants
         SpriteBatch spriteBatch;
 
 
-        private readonly TimeSpan tickDuration = TimeSpan.FromSeconds(0.5f);
+        private readonly TimeSpan tickDuration = TimeSpan.FromSeconds(0.1f);
 
-        private Map map;
+        public Map Map { get; private set; }
         private TimeSpan previousTick;
         private Texture2D blank;
         private MouseState mouseState;
@@ -65,11 +66,12 @@ namespace Ants
 
             CreateMap("Content/Maps/map1.txt");
 
-            Ants = new List<Ant>[]
-            {
-                new List<Ant>(),
-                new List<Ant>()
-            };
+            Ants = new List<Ant>[2];
+
+            for (int i = 0; i < 2; i++)
+			{
+			    Ants[i] = new List<Ant>();
+			}
 
             AntColors = new Color[]
             {
@@ -77,7 +79,21 @@ namespace Ants
                 Color.Blue
             };
 
-            Ants[0].Add(new Ant(this, map.Squares[20, 20], 0));
+            Ants[0].Add(new Ant(this, Map.Squares[20, 20], 0));
+            Ants[0].Add(new Ant(this, Map.Squares[20, 22], 0));
+            Ants[0].Add(new Ant(this, Map.Squares[20, 24], 0));
+            Ants[1].Add(new Ant(this, Map.Squares[25, 60], 1));
+            Ants[1].Add(new Ant(this, Map.Squares[27, 60], 1));
+            Ants[1].Add(new Ant(this, Map.Squares[30, 60], 1));
+
+            foreach (var ants in Ants)
+            {
+                foreach (Ant ant in ants)
+                {
+                    ant.ChangeState(new Attack(this, ant));
+                }
+            }
+            
 
             blank = new Texture2D(GraphicsDevice, 1, 1);
             blank.SetData(new[] { Color.White });
@@ -90,7 +106,7 @@ namespace Ants
             Hill[] hills;
 
             importer.Import(path, this, out squares, out hills);
-            map = new Map(this, squares);
+            Map = new Map(this, squares);
 
             Hills = hills;
         }
@@ -135,8 +151,9 @@ namespace Ants
                 int x = (int)(mouseState.X / Square.Width);
                 int y = (int)(mouseState.Y / Square.Height);
 
-                if (x < 0 || x >= map.Columns || y < 0 || y > map.Rows)
+                if (x < 0 || x >= Map.Columns || y < 0 || y > Map.Rows)
                 {
+                    // Outside window
                 }
 
                 else
@@ -144,7 +161,7 @@ namespace Ants
 
                     var ant = Ants[0][0];
 
-                    ant.Path = AStar.Search(map, ant.Square, map.Squares[y, x], map.Distance);
+                    ant.Path = AStar.Search(Map, ant.Square, Map.Squares[y, x], Map.Distance);
 
                     Console.WriteLine("{0}, {1}", x, y);
                 }
@@ -190,7 +207,7 @@ namespace Ants
             GraphicsDevice.Clear(Color.White);
 
             spriteBatch.Begin();
-            map.Draw(spriteBatch);
+            Map.Draw(spriteBatch);
 
             for (int i = 0; i < Ants.Length; i++)
             {
