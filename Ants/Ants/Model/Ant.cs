@@ -11,12 +11,11 @@ namespace Ants.Model
     public class Ant
     {
         private AntsGame game;
-        private int team;
         private StateMachine fsm;
         private Vector2 position;
         private Vector2 animationMargin;
-
         private Square square;
+
         public Square Square
         {
             get
@@ -33,7 +32,7 @@ namespace Ants.Model
             }
         }
 
-
+        public readonly int Team;
         public int AttackRate { get; set; }
         public int Health { get; set; }
         public Stack<Square> Path { get; set; }
@@ -41,7 +40,7 @@ namespace Ants.Model
         public Ant(AntsGame game, Square square, int team)
         {
             this.game = game;
-            this.team = team;
+            Team = team;
             Square = square;
             Health = 5;
             AttackRate = 1;
@@ -80,14 +79,14 @@ namespace Ants.Model
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            game.FillSquare(position, game.AntColors[team]);
+            game.FillSquare(position, game.AntColors[Team]);
         }
 
         public IEnumerable<Ant> GetEnemyAnts()
         {
             for (int i = 0; i < game.Ants.Length; i++)
             {
-                if (i == team)
+                if (i == Team)
                     continue;
 
                 foreach (var ant in game.Ants[i])
@@ -100,6 +99,30 @@ namespace Ants.Model
         public void ChangeState(State state)
         {
             fsm.ChangeState(state);
+        }
+
+        /// <summary>
+        /// Attacks enemy ant by decreasing the target's health by the attacker's attack rate
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns>true if target ant is killed, false otherwise</returns>
+        public bool Attack(Ant target)
+        {
+            // Check if ant is already dead
+            if (target.Health <= 0)
+                return false;
+
+
+            target.Health -= AttackRate;
+
+            if (target.Health <= 0)
+            {
+                AttackRate++;
+                Console.WriteLine("{0} killed {1} (new attack rate: {2})", this, target, AttackRate);
+                return true;
+            }
+
+            return false;
         }
     }
 }

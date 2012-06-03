@@ -183,23 +183,36 @@ namespace Ants
 
         private void AttackAnts()
         {
-            for (int i = 0; i < 2; i++)
+            var deadAnts = new List<Ant>();
+
+            for (int i = 0; i < Ants.Length; i++)
             {
-                for (int j = 0; j < Ants.Length; j++)
+                foreach (Ant ant in Ants[i])
                 {
-                    foreach (var ant in Ants[i])
+                    foreach (Square neighbor in Map.GetNeighbors(ant.Square))
                     {
-                        
+                        if (neighbor.Ant != null && neighbor.Ant.Team != ant.Team)
+                        {
+                            bool isDead = ant.Attack(neighbor.Ant);
+
+                            if (isDead)
+                                deadAnts.Add(neighbor.Ant);
+                        }
                     }
                 }
             }
+
+            foreach (Ant ant in deadAnts)
+            {
+                Ants[ant.Team].Remove(ant);
+            }
+            
         }
 
         private void SpawnAnts()
         {
             for (int i = 0; i < Hills.Length; i++)
             {
-
                 foreach (Square square in Map.GetNeighbors(Hills[i].Square))
                 {
                     if (square.IsPassable)
