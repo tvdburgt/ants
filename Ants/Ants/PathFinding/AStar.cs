@@ -10,7 +10,7 @@ namespace Ants.PathFinding
     public static class AStar
     {
         
-        public static Stack<Square> Search(Map map, Square source, Square target, Func<Square, Square, float> heuristic)
+        public static Stack<Square> Search(Map map, Square source, Square target, Func<Square, Square, int> heuristic)
         {
             Dictionary<Square, Square> parents = new Dictionary<Square, Square>();
             HashSet<Square> closed = new HashSet<Square>();
@@ -80,21 +80,6 @@ namespace Ants.PathFinding
             }
 
             return path;
-        }
-
-        public static float ManhattanHeuristic(Square square, Square target)
-        {
-            return Math.Abs(square.X - target.X) + Math.Abs(square.Y - target.Y);
-        }
-
-        public static float EuclideanHeuristic(Square square, Square target)
-        {
-            return Vector2.Distance(square.ScreenPosition, target.ScreenPosition);
-        }
-
-        public static float DijkstraHeuristic(Square square, Square target)
-        {
-            return 0f;
         }
     }
 }

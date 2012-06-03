@@ -13,6 +13,7 @@ namespace Ants.Model
         private AntsGame game;
         private int team;
         private StateMachine fsm;
+        private Vector2 position;
 
         public Square Square { get; private set; }
         public int AttackRate { get; set; }
@@ -26,24 +27,32 @@ namespace Ants.Model
             Square = square;
             Health = 5;
             AttackRate = 1;
+            position = square.ScreenPosition;
 
             fsm = new StateMachine();
         }
 
-        public void Update(GameTime time, bool tick)
+        public void Update(GameTime time, bool tick, float progress)
         {
             if (tick)
             {
+                
                 if (Path != null && Path.Count > 0)
                 {
                     Square = Path.Pop();
                 }
             }
+
+            else if (position != Square.ScreenPosition)
+            {
+                Vector2 delta = Square.ScreenPosition - position;
+                position += delta * progress;
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            game.FillSquare(Square, game.AntColors[team]);
+            game.FillSquare(position, game.AntColors[team]);
         }
 
         private IEnumerable<Ant> GetEnemyAnts()

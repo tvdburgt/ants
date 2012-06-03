@@ -47,7 +47,7 @@ namespace Ants.Model
                 for (int x = 0; x < Columns; x++)
                 {
                     if (!Squares[y, x].IsPassable)
-                        game.FillSquare(Squares[y, x], Color.Black);
+                        game.FillSquare(Squares[y, x].ScreenPosition, Color.Black);
                 }
             }
         }
@@ -78,32 +78,27 @@ namespace Ants.Model
             int x = square.X;
             int y = square.Y;
 
+            var a = -1 % 60;
+
             return new Square[]
             {
                 Squares[(y + 1) % Rows, x], // 12
                 Squares[y, (x + 1) % Columns], // 3
-                Squares[(y - 1) % Rows, x], // 6
-                Squares[y, (x - 1) % Columns], // 9
+
+                // C#'s modulo doesn't work well with negative numbers, so use ternary statement here
+                Squares[y - 1 < 0 ? Rows - 1 : y - 1, x], // 6
+                Squares[y, x - 1 < 0 ? Columns - 1 : x - 1], // 9
             };
         }
 
-        //private void DrawSquare(SpriteBatch spriteBatch, Color color, float x, float y)
-        //{
-        //    spriteBatch.Draw(blankTexture, new Rectangle((int)x, (int)y, (int)Square.Width, (int)Square.Height), color);
-        //}
+        public int Distance(Square square1, Square square2)
+        {
+            int deltaX = Math.Abs(square1.X - square2.X);
+            int deltaY = Math.Abs(square1.Y - square2.Y);
 
-        //private void DrawGridLine(SpriteBatch spriteBatch, Color color, float x1, float y1, float x2, float y2)
-        //{
-        //    var point1 = new Vector2(x1, y1);
-        //    var point2 = new Vector2(x2, y2);
-
-        //    float angle = (float)Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
-        //    float length = Vector2.Distance(point1, point2);
-
-        //    spriteBatch.Draw(blankTexture, point1, null, color,
-        //               angle, Vector2.Zero, new Vector2(length, 1),
-        //               SpriteEffects.None, 0);
-        //}
+            // Get shortest distance (possibly by crossing edges of map)
+            return Math.Min(deltaX, Columns - deltaX) + Math.Min(deltaY, Rows - deltaY);
+        }
     }
 }
 

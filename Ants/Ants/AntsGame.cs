@@ -22,7 +22,7 @@ namespace Ants
         SpriteBatch spriteBatch;
 
 
-        public const int TickDuration = 500;
+        private readonly TimeSpan tickDuration = TimeSpan.FromSeconds(0.5f);
 
         private Map map;
         private TimeSpan previousTick;
@@ -51,8 +51,6 @@ namespace Ants
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
             base.Initialize();
         }
 
@@ -112,18 +110,22 @@ namespace Ants
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 this.Exit();
 
-            if (gameTime.TotalGameTime - previousTick > TimeSpan.FromMilliseconds(TickDuration))
+            TimeSpan timeSinceTick = gameTime.TotalGameTime - previousTick;
+            float progress = (float)(timeSinceTick.TotalMilliseconds / tickDuration.TotalMilliseconds);
+
+            if (timeSinceTick > tickDuration)
             {
                 previousTick = gameTime.TotalGameTime;
                 tick = true;
                 AttackAnts();
+                //SpawnAnts();
             }
 
             foreach (List<Ant> ants in Ants)
             {
                 foreach (Ant ant in ants)
                 {
-                    ant.Update(gameTime, tick);
+                    ant.Update(gameTime, tick, progress);
                 }
             }
 
@@ -133,11 +135,19 @@ namespace Ants
                 int x = (int)(mouseState.X / Square.Width);
                 int y = (int)(mouseState.Y / Square.Height);
 
-                var ant = Ants[0][0];
+                if (x < 0 || x >= map.Columns || y < 0 || y > map.Rows)
+                {
+                }
 
-                ant.Path = AStar.Search(map, ant.Square, map.Squares[y, x], AStar.ManhattanHeuristic);
+                else
+                {
 
-                Console.WriteLine("{0}, {1}", x, y);
+                    var ant = Ants[0][0];
+
+                    ant.Path = AStar.Search(map, ant.Square, map.Squares[y, x], map.Distance);
+
+                    Console.WriteLine("{0}, {1}", x, y);
+                }
             }
 
             base.Update(gameTime);
@@ -154,6 +164,20 @@ namespace Ants
                         
                     }
                 }
+            }
+        }
+
+        private void SpawnAnts()
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                Stack<Square> squares = new Stack<Square>();
+                squares.Push(Hills[i].Square);
+
+                while (squares.Count > 0)
+	            {
+	                var square = squares.Pop();
+	            }
             }
         }
 
@@ -199,10 +223,10 @@ namespace Ants
                        SpriteEffects.None, 0);
         }
 
-        public void FillSquare(Square square, Color color)
+        public void FillSquare(Vector2 position, Color color)
         {
             Vector2 scale = new Vector2(Square.Width, Square.Height);
-            spriteBatch.Draw(blank, square.ScreenPosition, null, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+            spriteBatch.Draw(blank, position, null, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
         }
 
         public Texture2D CreateCircle(int radius, Color color)
