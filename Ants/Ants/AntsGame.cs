@@ -23,7 +23,6 @@ namespace Ants
         SpriteBatch spriteBatch;
 
         public const int TeamCount = 2;
-
         private readonly TimeSpan tickRate;
         private readonly TimeSpan spawnRate;
 
@@ -33,6 +32,7 @@ namespace Ants
         private Texture2D blank;
         private MouseState mouseState;
         private MouseState previousMouseState;
+        private int tickCount;
 
         public List<Ant>[] Ants { get; private set; }
         public Hill[] Hills { get; private set; }
@@ -131,6 +131,8 @@ namespace Ants
             {
                 previousTick = gameTime.TotalGameTime;
                 tick = true;
+                tickCount++;
+                Window.Title = string.Format("Ants ({0})", tickCount);
                 AttackAnts();
             }
 
