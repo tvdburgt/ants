@@ -43,10 +43,10 @@ namespace Ants
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            graphics.PreferredBackBufferWidth = 1024;
-            graphics.PreferredBackBufferHeight = 768;
+            graphics.PreferredBackBufferWidth = 800;
+            graphics.PreferredBackBufferHeight = 600;
 
-            tickRate = TimeSpan.FromSeconds(0.03f);
+            tickRate = TimeSpan.FromSeconds(0.3f);
             spawnRate = TimeSpan.FromSeconds(tickRate.TotalSeconds * 10);
         }
 
