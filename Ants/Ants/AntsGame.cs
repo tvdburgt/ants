@@ -46,7 +46,7 @@ namespace Ants
             graphics.PreferredBackBufferWidth = 1024;
             graphics.PreferredBackBufferHeight = 768;
 
-            tickRate = TimeSpan.FromSeconds(0.3f);
+            tickRate = TimeSpan.FromSeconds(0.03f);
             spawnRate = TimeSpan.FromSeconds(tickRate.TotalSeconds * 10);
         }
 
